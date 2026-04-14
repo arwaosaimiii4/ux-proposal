@@ -34,35 +34,22 @@
 
     const packages = [
       {
-        id: "basic",
-        name: "تدقيق أساسي",
-        price: 800,
-        duration: "3–4 أيام عمل",
-        icon: "🔍",
-        accent: "#6B84A3",
+        id: "basic", name: "تدقيق أساسي", price: 800, duration: "3–4 أيام عمل",
+        icon: "🔍", accent: "#6B84A3",
         description: "مثالي للتطبيقات الصغيرة أو من يريد نظرة سريعة وواضحة",
         features: ["مراجعة حتى 10 شاشات","تقرير PDF مفصّل","تحديد المشاكل الحرجة","توصيات عامة بالأولويات","راوند تعديل واحد"],
         missing: ["Wireframes مقترحة", "جلسة شرح مباشرة"],
       },
       {
-        id: "standard",
-        name: "تدقيق شامل",
-        price: 1500,
-        duration: "5–7 أيام عمل",
-        icon: "🎯",
-        accent: "#B8962E",
-        badge: "الأكثر طلباً",
+        id: "standard", name: "تدقيق شامل", price: 1500, duration: "5–7 أيام عمل",
+        icon: "🎯", accent: "#B8962E", badge: "الأكثر طلباً",
         description: "الخيار الأمثل لمعظم التطبيقات — تحليل عميق مع حلول مقترحة",
         features: ["مراجعة حتى 25 شاشة","تقرير PDF + Presentation كاملة","تحليل User Flow","Heuristic Evaluation","Wireframes للمشاكل الرئيسية","جلسة شرح 30 دقيقة","راوندان للتعديل"],
         missing: [],
       },
       {
-        id: "premium",
-        name: "تدقيق متكامل",
-        price: 2800,
-        duration: "10–14 يوم عمل",
-        icon: "⭐",
-        accent: "#8B7355",
+        id: "premium", name: "تدقيق متكامل", price: 2800, duration: "10–14 يوم عمل",
+        icon: "⭐", accent: "#8B7355",
         description: "للمنتجات الجادة — تحليل شامل من كل الزوايا مع متابعة ما بعد التسليم",
         features: ["شاشات غير محدودة","تقرير + Presentation احترافية","تحليل منافسين UX","User Flow + Journey Map","Wireframes لجميع المشاكل","Usability Score موثّق","جلستا شرح (قبل وبعد)","3 راوندات تعديل","متابعة لمدة شهر بعد التسليم"],
         missing: [],
@@ -70,45 +57,42 @@
     ];
 
     const addons = [
-      { id: "urgent",   label: "تسليم عاجل (نصف المدة)",   price: 300, icon: "⚡" },
-      { id: "bilingual",label: "تقرير عربي + إنجليزي",      price: 200, icon: "🌐" },
-      { id: "video",    label: "تسجيل فيديو للملاحظات",     price: 250, icon: "🎥" },
-      { id: "followup", label: "متابعة شهرية بعد التسليم",  price: 400, icon: "📅" },
+      { id: "urgent",    label: "تسليم عاجل (نصف المدة)",  price: 300, icon: "⚡" },
+      { id: "bilingual", label: "تقرير عربي + إنجليزي",     price: 200, icon: "🌐" },
+      { id: "video",     label: "تسجيل فيديو للملاحظات",    price: 250, icon: "🎥" },
+      { id: "followup",  label: "متابعة شهرية بعد التسليم", price: 400, icon: "📅" },
     ];
 
-    const inputStyle = {
+    const inputStyle = (hasError) => ({
       width: "100%",
       background: "rgba(255,255,255,0.02)",
-      border: "1px solid rgba(255,255,255,0.07)",
-      borderRadius: 9,
-      padding: "14px 18px",
-      color: "#CBD5E0",
-      fontSize: 14,
+      border: `1px solid ${hasError ? "rgba(220,50,50,0.5)" : "rgba(255,255,255,0.07)"}`,
+      borderRadius: 9, padding: "14px 18px",
+      color: "#CBD5E0", fontSize: 14,
       fontFamily: "'Cairo', sans-serif",
-      outline: "none",
-      boxSizing: "border-box",
-    };
+      outline: "none", boxSizing: "border-box",
+    });
 
     const labelStyle = {
-      fontSize: 11,
-      color: "#3D4F61",
-      marginBottom: 10,
-      letterSpacing: "0.1em",
-      textTransform: "uppercase",
-      display: "flex",
-      alignItems: "center",
-      gap: 4,
+      fontSize: 11, color: "#3D4F61", marginBottom: 10,
+      letterSpacing: "0.1em", textTransform: "uppercase",
+      display: "flex", alignItems: "center", gap: 4,
     };
 
+    const errMsg = (msg) => (
+      <div style={{ color: "#FC8181", fontSize: 11, marginTop: 5 }}>{msg}</div>
+    );
+
     function Proposal() {
-      const [selected, setSelected]       = useState(null);
+      const [selected, setSelected]         = useState(null);
       const [activeAddons, setActiveAddons] = useState([]);
-      const [submitted, setSubmitted]     = useState(false);
-      const [clientName, setClientName]   = useState("");
-      const [clientPhone, setClientPhone] = useState("");
-      const [showContact, setShowContact] = useState(false);
-      const [sending, setSending]         = useState(false);
-      const [emailError, setEmailError]   = useState(false);
+      const [submitted, setSubmitted]       = useState(false);
+      const [clientName, setClientName]     = useState("");
+      const [clientPhone, setClientPhone]   = useState("");
+      const [clientEmail, setClientEmail]   = useState("");
+      const [showContact, setShowContact]   = useState(false);
+      const [sending, setSending]           = useState(false);
+      const [emailError, setEmailError]     = useState(false);
       const [showValidation, setShowValidation] = useState(false);
 
       const pkg = packages.find((p) => p.id === selected);
@@ -119,7 +103,8 @@
       const total = (pkg?.price || 0) + addonsTotal;
 
       const phoneValid = clientPhone.trim().length >= 9;
-      const canSubmit  = selected && clientName.trim() && phoneValid && !sending;
+      const emailValid = clientEmail.trim().length >= 5 && clientEmail.includes("@");
+      const canSubmit  = selected && clientName.trim() && phoneValid && emailValid && !sending;
 
       const toggleAddon = (id) =>
         setActiveAddons((prev) =>
@@ -140,6 +125,7 @@
           await emailjs.send("service_h8v9v6c", "template_psf118q", {
             client_name:  clientName,
             client_phone: clientPhone,
+            client_email: clientEmail,
             package_name: pkg?.name,
             total:        total.toLocaleString(),
             addons:       addonNames,
@@ -154,8 +140,14 @@
 
       const buildWhatsApp = () => {
         const addonNames = activeAddons.map((id) => addons.find((a) => a.id === id)?.label).join("، ");
-        const msg = `مرحباً ${designer.name} 👋\nاطلعت على عرضك وأبغى أتواصل معك بخصوص:\n\n📦 الباقة: ${pkg?.name}\n💰 الإجمالي: ${total.toLocaleString()} ريال\n${addonNames ? `➕ الإضافات: ${addonNames}\n` : ""}📱 رقمي: ${clientPhone}\nاسمي: ${clientName}`;
+        const msg = `مرحباً ${designer.name} 👋\nاطلعت على عرضك وأبغى أتواصل معك بخصوص:\n\n📦 الباقة: ${pkg?.name}\n💰 الإجمالي: ${total.toLocaleString()} ريال\n${addonNames ? `➕ الإضافات: ${addonNames}\n` : ""}📱 رقمي: ${clientPhone}\n✉️ إيميلي: ${clientEmail}\nاسمي: ${clientName}`;
         return `https://wa.me/${designer.whatsapp}?text=${encodeURIComponent(msg)}`;
+      };
+
+      const resetForm = () => {
+        setSubmitted(false); setSelected(null); setActiveAddons([]);
+        setClientName(""); setClientPhone(""); setClientEmail("");
+        setShowValidation(false);
       };
 
       /* ── صفحة الشكر ── */
@@ -178,13 +170,11 @@
                 شكراً {clientName}
               </h2>
               <p style={{ color: "#5A6A7D", fontSize: 14, lineHeight: 2, marginBottom: 32 }}>
-                تم استلام طلبك — سيتواصل معك {designer.name} على رقم <span style={{color:"#B8962E",fontWeight:700}}>{clientPhone}</span> خلال 24 ساعة.
+                تم استلام طلبك — سيتواصل معك {designer.name} خلال 24 ساعة.
               </p>
               <div style={{
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(255,255,255,0.06)",
-                borderRadius: 12, padding: "20px 24px",
-                marginBottom: 28, textAlign: "right",
+                background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: 12, padding: "20px 24px", marginBottom: 28, textAlign: "right",
               }}>
                 <div style={{ color: "#3D4F61", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>ملخص الطلب</div>
                 <div style={{ color: "#CBD5E0", fontWeight: 700, fontSize: 15, marginBottom: 4 }}>{pkg?.name}</div>
@@ -198,17 +188,15 @@
                 </div>
               </div>
               <a href={buildWhatsApp()} target="_blank" rel="noreferrer" style={{
-                display: "block",
-                background: "linear-gradient(135deg, #1da851, #25D366)",
+                display: "block", background: "linear-gradient(135deg, #1da851, #25D366)",
                 color: "#fff", borderRadius: 10, padding: "15px",
                 fontWeight: 700, fontSize: 14, textDecoration: "none",
                 letterSpacing: "0.02em", marginBottom: 12,
               }}>
                 التواصل عبر واتساب
               </a>
-              <button onClick={() => { setSubmitted(false); setSelected(null); setActiveAddons([]); setClientName(""); setClientPhone(""); setShowValidation(false); }} style={{
-                background: "transparent",
-                border: "1px solid rgba(255,255,255,0.07)",
+              <button onClick={resetForm} style={{
+                background: "transparent", border: "1px solid rgba(255,255,255,0.07)",
                 color: "#4A5568", borderRadius: 10, padding: "12px",
                 fontWeight: 600, fontSize: 13, cursor: "pointer",
                 fontFamily: "'Cairo', sans-serif", width: "100%",
@@ -225,8 +213,7 @@
         <div dir="rtl" style={{
           minHeight: "100vh",
           background: "linear-gradient(160deg, #0E1117 0%, #111520 50%, #0E1117 100%)",
-          fontFamily: "'Cairo', sans-serif", color: "#E2E8F0",
-          padding: "0 0 80px",
+          fontFamily: "'Cairo', sans-serif", color: "#E2E8F0", padding: "0 0 80px",
         }}>
 
           {/* Hero */}
@@ -366,49 +353,48 @@
             <div style={{ height: 1, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent)", marginBottom: 28 }} />
 
             {/* ── حقول العميل ── */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
-
-              {/* الاسم */}
-              <div>
-                <div style={labelStyle}>
-                  الاسم الكريم
-                  <span style={{ color: "#FC8181", fontSize: 14 }}>*</span>
-                </div>
-                <input
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
-                  placeholder="مثال: محمد العتيبي"
-                  style={{
-                    ...inputStyle,
-                    borderColor: showValidation && !clientName.trim() ? "rgba(220,50,50,0.5)" : "rgba(255,255,255,0.07)",
-                  }}
-                />
-                {showValidation && !clientName.trim() && (
-                  <div style={{ color: "#FC8181", fontSize: 11, marginTop: 5 }}>يرجى إدخال الاسم</div>
-                )}
+            {/* الاسم — سطر كامل */}
+            <div style={{ marginBottom: 14 }}>
+              <div style={labelStyle}>
+                الاسم الكريم <span style={{ color: "#FC8181", fontSize: 14 }}>*</span>
               </div>
+              <input
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                placeholder="مثال: محمد العتيبي"
+                style={inputStyle(showValidation && !clientName.trim())}
+              />
+              {showValidation && !clientName.trim() && errMsg("يرجى إدخال الاسم")}
+            </div>
 
-              {/* رقم الجوال */}
+            {/* الجوال والإيميل — جنب بعض */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
               <div>
                 <div style={labelStyle}>
-                  رقم الجوال
-                  <span style={{ color: "#FC8181", fontSize: 14 }}>*</span>
+                  رقم الجوال <span style={{ color: "#FC8181", fontSize: 14 }}>*</span>
                 </div>
                 <input
                   value={clientPhone}
                   onChange={(e) => setClientPhone(e.target.value)}
                   placeholder="مثال: 0501234567"
                   type="tel"
-                  style={{
-                    ...inputStyle,
-                    borderColor: showValidation && !phoneValid ? "rgba(220,50,50,0.5)" : "rgba(255,255,255,0.07)",
-                  }}
+                  style={inputStyle(showValidation && !phoneValid)}
                 />
-                {showValidation && !phoneValid && (
-                  <div style={{ color: "#FC8181", fontSize: 11, marginTop: 5 }}>يرجى إدخال رقم جوال صحيح</div>
-                )}
+                {showValidation && !phoneValid && errMsg("يرجى إدخال رقم صحيح")}
               </div>
-
+              <div>
+                <div style={labelStyle}>
+                  الإيميل <span style={{ color: "#FC8181", fontSize: 14 }}>*</span>
+                </div>
+                <input
+                  value={clientEmail}
+                  onChange={(e) => setClientEmail(e.target.value)}
+                  placeholder="مثال: name@email.com"
+                  type="email"
+                  style={inputStyle(showValidation && !emailValid)}
+                />
+                {showValidation && !emailValid && errMsg("يرجى إدخال إيميل صحيح")}
+              </div>
             </div>
 
             {/* رسالة الباقة */}
@@ -452,23 +438,15 @@
                   {selected && <span style={{ color: "#4A5568", fontSize: 14, fontWeight: 600 }}>ريال</span>}
                 </div>
               </div>
-              <button
-                onClick={handleSubmit}
-                style={{
-                  background: canSubmit
-                    ? "linear-gradient(135deg, #9A7A24, #C4A030)"
-                    : "rgba(255,255,255,0.03)",
-                  color: canSubmit ? "#0E1117" : "#2D3748",
-                  border: "none",
-                  borderRadius: 9, padding: "16px 42px",
-                  fontWeight: 800, fontSize: 14,
-                  cursor: "pointer",
-                  fontFamily: "'Cairo', sans-serif",
-                  letterSpacing: "0.04em",
-                  boxShadow: canSubmit ? "0 8px 28px rgba(184,150,46,0.2)" : "none",
-                  transition: "all 0.2s",
-                }}
-              >
+              <button onClick={handleSubmit} style={{
+                background: canSubmit ? "linear-gradient(135deg, #9A7A24, #C4A030)" : "rgba(255,255,255,0.03)",
+                color: canSubmit ? "#0E1117" : "#2D3748",
+                border: "none", borderRadius: 9, padding: "16px 42px",
+                fontWeight: 800, fontSize: 14, cursor: "pointer",
+                fontFamily: "'Cairo', sans-serif", letterSpacing: "0.04em",
+                boxShadow: canSubmit ? "0 8px 28px rgba(184,150,46,0.2)" : "none",
+                transition: "all 0.2s",
+              }}>
                 {sending ? "جاري الإرسال..." : "تأكيد الاختيار"}
               </button>
             </div>
