@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Services Proposal — Arwa Alousaimi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #0E1117; color: #E2E8F0; }
+    input::placeholder { color: #4A5568; }
+    input:focus { border-color: rgba(184,150,46,0.5) !important; outline: none; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+    emailjs.init("qvI3a004Gj0pFdS0E");
+
+    const designer = {
+      name: "Arwa Alousaimi",
+      title: "UI/UX Designer · Mobile Apps",
+      bio: "Specialized in UX auditing for mobile applications — I transform interface problems into real growth opportunities through precise analysis and actionable recommendations.",
+      phone: "0500390092",
+      email: "arwaosaimi@hotmail.com",
+      whatsapp: "966500390092",
+    };
+
+    const sections = [
+      {
+        id: "audit",
+        num: "01",
+        title: "UX Audit",
+        subtitle: "User Experience Analysis",
+        services: [
+          { id: "a1", name: "Full Audit of Current App",        desc: "Comprehensive review of the existing app identifying critical usability issues",  price: 1100 },
+          { id: "a2", name: "Usability Testing & Flow Problems", desc: "Testing ease of use and analyzing navigation and interaction flow issues",         price: 1000 },
+          { id: "a3", name: "Competitor & Benchmark Review",     desc: "Comparing the app against competitors and industry best practices",                price: 1900 },
+          { id: "a4", name: "Lo-Fi Wireframing",                 desc: "Sketching initial wireframes for proposed solutions and improvements",              price: 900  },
+        ],
+      },
+      {
+        id: "redesign",
+        num: "02",
+        title: "UX Redesign",
+        subtitle: "User Experience Redesign",
+        services: [
+          { id: "r1", name: "New Information Architecture (IA)", desc: "Restructuring app information and building a clear, logical hierarchy",            price: 1700 },
+          { id: "r2", name: "User Flows",                        desc: "Designing complete user journeys from entry point to final action",                price: 2200 },
+        ],
+      },
+    ];
+
+    const allServices = sections.flatMap(s => s.services);
+
+    const inputStyle = (err) => ({
+      width: "100%",
+      background: "rgba(255,255,255,0.02)",
+      border: `1px solid ${err ? "rgba(220,50,50,0.5)" : "rgba(255,255,255,0.07)"}`,
+      borderRadius: 9,
+      padding: "13px 18px",
+      color: "#CBD5E0",
+      fontSize: 14,
+      fontFamily: "'Inter', sans-serif",
+      boxSizing: "border-box",
+    });
+
+    const labelStyle = {
+      fontSize: 11,
+      color: "#3D4F61",
+      marginBottom: 8,
+      letterSpacing: "0.1em",
+      textTransform: "uppercase",
+      display: "flex",
+      alignItems: "center",
+      gap: 4,
+    };
+
+    function Proposal() {
+      const [selected, setSelected]         = useState([]);
+      const [submitted, setSubmitted]       = useState(false);
+      const [clientName, setClientName]     = useState("");
+      const [clientPhone, setClientPhone]   = useState("");
+      const [clientEmail, setClientEmail]   = useState("");
+      const [showContact, setShowContact]   = useState(false);
+      const [sending, setSending]           = useState(false);
+      const [emailError, setEmailError]     = useState(false);
+      const [showValidation, setShowValidation] = useState(false);
+
+      const toggleService = (id) =>
+        setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+
+      const total = selected.reduce((sum, id) => {
+        const s = allServices.find(x => x.id === id);
+        return sum + (s?.price || 0);
+      }, 0);
+
+      const selectedServices = selected.map(id => allServices.find(x => x.id === id));
+      const phoneValid  = clientPhone.trim().length >= 9;
+      const emailValid  = clientEmail.includes("@") && clientEmail.trim().length >= 5;
+      const canSubmit   = selected.length > 0 && clientName.trim() && phoneValid && emailValid && !sending;
+
+      const handleSubmit = async () => {
+        setShowValidation(true);
+        if (!canSubmit) return;
+        setSending(true);
+        setEmailError(false);
+        const servicesList = selectedServices.map(s => `• ${s.name} — ${s.price.toLocaleString()} SAR`).join("\n");
+        try {
+          await emailjs.send("service_h8v9v6c", "template_psf118q", {
+            client_name:  clientName,
+            client_phone: clientPhone,
+            client_email: clientEmail,
+            package_name: selectedServices.map(s => s.name).join(", "),
+            total:        total.toLocaleString(),
+            addons:       servicesList,
+          });
+          setSubmitted(true);
+        } catch(e) {
+          setEmailError(true);
+        } finally {
+          setSending(false);
+        }
+      };
+
+      const buildWhatsApp = () => {
+        const list = selectedServices.map(s => `• ${s.name} — ${s.price.toLocaleString()} SAR`).join("\n");
+        const msg = `Hi ${designer.name} 👋\nI reviewed your proposal and I'd like to get in touch regarding:\n\n${list}\n\n💰 Total: ${total.toLocaleString()} SAR\n📱 Phone: ${clientPhone}\n✉️ Email: ${clientEmail}\nName: ${clientName}`;
+        return `https://wa.me/${designer.whatsapp}?text=${encodeURIComponent(msg)}`;
+      };
+
+      const resetForm = () => {
+        setSubmitted(false); setSelected([]); setClientName("");
+        setClientPhone(""); setClientEmail(""); setShowValidation(false);
+      };
+
+      /* ── Thank you page ── */
+      if (submitted) {
+        return (
+          <div style={{
+            minHeight: "100vh",
+            background: "linear-gradient(160deg, #0E1117, #141A24)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: 24,
+          }}>
+            <div style={{
+              background: "rgba(184,150,46,0.05)",
+              border: "1px solid rgba(184,150,46,0.22)",
+              borderRadius: 24, padding: "52px 40px",
+              textAlign: "center", maxWidth: 500, width: "100%",
+            }}>
+              <div style={{ color: "#B8962E", fontSize: 32, marginBottom: 18 }}>✦</div>
+              <h2 style={{ color: "#E8DFC8", fontSize: 22, fontWeight: 700, marginBottom: 10 }}>
+                Thank you, {clientName}!
+              </h2>
+              <p style={{ color: "#5A6A7D", fontSize: 14, lineHeight: 1.9, marginBottom: 28 }}>
+                Your request has been received — {designer.name} will reach out within 24 hours to confirm details and get started.
+              </p>
+              <div style={{
+                background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: 12, padding: "18px 22px", marginBottom: 24, textAlign: "left",
+              }}>
+                <div style={{ color: "#3D4F61", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>Order Summary</div>
+                {selectedServices.map(s => (
+                  <div key={s.id} style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                    <span style={{ color: "#8899AA", fontSize: 13 }}>{s.name}</span>
+                    <span style={{ color: "#CBD5E0", fontSize: 13, fontWeight: 600 }}>{s.price.toLocaleString()} SAR</span>
+                  </div>
+                ))}
+                <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", marginTop: 12, paddingTop: 12, display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ color: "#667788", fontSize: 13 }}>Total</span>
+                  <span style={{ color: "#B8962E", fontWeight: 900, fontSize: 20 }}>{total.toLocaleString()} SAR</span>
+                </div>
+              </div>
+              <a href={buildWhatsApp()} target="_blank" rel="noreferrer" style={{
+                display: "block", background: "linear-gradient(135deg, #1da851, #25D366)",
+                color: "#fff", borderRadius: 10, padding: "14px",
+                fontWeight: 700, fontSize: 14, textDecoration: "none", marginBottom: 10,
+              }}>
+                Contact via WhatsApp
+              </a>
+              <button onClick={resetForm} style={{
+                background: "transparent", border: "1px solid rgba(255,255,255,0.07)",
+                color: "#4A5568", borderRadius: 10, padding: "12px", fontWeight: 600,
+                fontSize: 13, cursor: "pointer", fontFamily: "'Inter', sans-serif", width: "100%",
+              }}>
+                Submit Another Request
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      /* ── Main page ── */
+      return (
+        <div style={{ minHeight: "100vh", background: "linear-gradient(160deg, #0E1117 0%, #111520 50%, #0E1117 100%)", padding: "0 0 80px" }}>
+
+          {/* Hero */}
+          <div style={{
+            background: "linear-gradient(180deg, rgba(184,150,46,0.06) 0%, transparent 100%)",
+            borderBottom: "1px solid rgba(255,255,255,0.05)",
+            padding: "60px 24px 44px", textAlign: "center",
+          }}>
+            <div style={{ width: 48, height: 1, background: "linear-gradient(90deg, transparent, #B8962E, transparent)", margin: "0 auto 24px" }} />
+            <div style={{ color: "#B8962E", fontSize: 10, letterSpacing: "0.22em", fontWeight: 700, marginBottom: 14, textTransform: "uppercase" }}>
+              Professional Services Proposal
+            </div>
+            <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 8, color: "#EDE8D8" }}>{designer.name}</h1>
+            <div style={{ color: "#4A6785", fontSize: 13, fontWeight: 500, marginBottom: 18, letterSpacing: "0.05em" }}>{designer.title}</div>
+            <p style={{ color: "#4A5568", fontSize: 14, lineHeight: 1.9, maxWidth: 520, margin: "0 auto 28px" }}>{designer.bio}</p>
+            <button onClick={() => setShowContact(!showContact)} style={{
+              background: "transparent", border: "1px solid rgba(184,150,46,0.3)",
+              color: "#B8962E", borderRadius: 7, padding: "9px 24px",
+              fontSize: 12, fontWeight: 600, cursor: "pointer",
+              fontFamily: "'Inter', sans-serif", letterSpacing: "0.04em",
+            }}>
+              {showContact ? "Hide Contact Info" : "Contact Info"}
+            </button>
+            {showContact && (
+              <div style={{ marginTop: 16, display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
+                {[{ icon: "📞", val: designer.phone }, { icon: "✉️", val: designer.email }].map(c => (
+                  <div key={c.val} style={{
+                    background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)",
+                    borderRadius: 7, padding: "8px 16px", fontSize: 13, color: "#6B7A8D",
+                    display: "flex", gap: 8, alignItems: "center",
+                  }}>
+                    {c.icon} {c.val}
+                  </div>
+                ))}
+              </div>
+            )}
+            <div style={{ width: 48, height: 1, background: "linear-gradient(90deg, transparent, rgba(184,150,46,0.25), transparent)", margin: "26px auto 0" }} />
+          </div>
+
+          <div style={{ maxWidth: 780, margin: "0 auto", padding: "0 20px" }}>
+
+            {/* Services */}
+            {sections.map((section, si) => (
+              <div key={section.id}>
+                <div style={{ padding: si === 0 ? "40px 0 20px" : "32px 0 20px", display: "flex", alignItems: "baseline", gap: 12 }}>
+                  <span style={{ color: "#B8962E", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em" }}>{section.num}</span>
+                  <div>
+                    <h2 style={{ fontSize: 17, fontWeight: 700, color: "#CBD5E0", marginBottom: 2 }}>{section.title}</h2>
+                    <div style={{ fontSize: 12, color: "#3D4F61", letterSpacing: "0.04em" }}>{section.subtitle}</div>
+                  </div>
+                </div>
+
+                {section.services.map(svc => {
+                  const on = selected.includes(svc.id);
+                  return (
+                    <div
+                      key={svc.id}
+                      onClick={() => toggleService(svc.id)}
+                      style={{
+                        display: "flex", justifyContent: "space-between", alignItems: "center",
+                        padding: "18px 20px",
+                        background: on ? "rgba(184,150,46,0.06)" : "rgba(255,255,255,0.02)",
+                        border: `1px solid ${on ? "rgba(184,150,46,0.35)" : "rgba(255,255,255,0.06)"}`,
+                        borderRadius: 12, marginBottom: 10, cursor: "pointer",
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+                        <div style={{
+                          width: 18, height: 18, borderRadius: 5, flexShrink: 0,
+                          border: `1.5px solid ${on ? "#B8962E" : "rgba(255,255,255,0.15)"}`,
+                          background: on ? "#B8962E" : "transparent",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 10, color: "#0E1117", fontWeight: 900,
+                          transition: "all 0.2s",
+                        }}>
+                          {on ? "✓" : ""}
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 600, color: on ? "#E2E8F0" : "#8899AA" }}>{svc.name}</div>
+                          <div style={{ fontSize: 12, color: "#3D4F61", marginTop: 3 }}>{svc.desc}</div>
+                        </div>
+                      </div>
+                      <div style={{ fontSize: 16, fontWeight: 700, color: on ? "#B8962E" : "#3D4F61", whiteSpace: "nowrap", marginLeft: 16 }}>
+                        {svc.price.toLocaleString()} SAR
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {si < sections.length - 1 && (
+                  <div style={{ height: 1, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent)", margin: "8px 0" }} />
+                )}
+              </div>
+            ))}
+
+            {/* No service selected warning */}
+            {showValidation && selected.length === 0 && (
+              <div style={{
+                background: "rgba(220,50,50,0.07)", border: "1px solid rgba(220,50,50,0.2)",
+                borderRadius: 9, padding: "12px 18px", color: "#FC8181",
+                fontSize: 13, margin: "16px 0", textAlign: "center",
+              }}>
+                Please select at least one service above
+              </div>
+            )}
+
+            {/* Divider */}
+            <div style={{ height: 1, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent)", margin: "28px 0" }} />
+
+            {/* Client fields */}
+            <div style={{ marginBottom: 14 }}>
+              <div style={labelStyle}>Full Name <span style={{ color: "#FC8181" }}>*</span></div>
+              <input
+                value={clientName}
+                onChange={e => setClientName(e.target.value)}
+                placeholder="e.g. Mohammed Al-Otaibi"
+                style={inputStyle(showValidation && !clientName.trim())}
+              />
+              {showValidation && !clientName.trim() && <div style={{ color: "#FC8181", fontSize: 11, marginTop: 5 }}>Name is required</div>}
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 20 }}>
+              <div>
+                <div style={labelStyle}>Phone Number <span style={{ color: "#FC8181" }}>*</span></div>
+                <input
+                  value={clientPhone}
+                  onChange={e => setClientPhone(e.target.value)}
+                  placeholder="e.g. 0501234567"
+                  type="tel"
+                  style={inputStyle(showValidation && !phoneValid)}
+                />
+                {showValidation && !phoneValid && <div style={{ color: "#FC8181", fontSize: 11, marginTop: 5 }}>Enter a valid phone number</div>}
+              </div>
+              <div>
+                <div style={labelStyle}>Email Address <span style={{ color: "#FC8181" }}>*</span></div>
+                <input
+                  value={clientEmail}
+                  onChange={e => setClientEmail(e.target.value)}
+                  placeholder="e.g. name@email.com"
+                  type="email"
+                  style={inputStyle(showValidation && !emailValid)}
+                />
+                {showValidation && !emailValid && <div style={{ color: "#FC8181", fontSize: 11, marginTop: 5 }}>Enter a valid email address</div>}
+              </div>
+            </div>
+
+            {emailError && (
+              <div style={{
+                background: "rgba(220,50,50,0.07)", border: "1px solid rgba(220,50,50,0.2)",
+                borderRadius: 9, padding: "12px 18px", color: "#FC8181",
+                fontSize: 13, marginBottom: 16, textAlign: "center",
+              }}>
+                Something went wrong. Please try again.
+              </div>
+            )}
+
+            {/* Total + CTA */}
+            <div style={{
+              background: "linear-gradient(135deg, rgba(184,150,46,0.06), rgba(14,17,23,0.6))",
+              border: "1px solid rgba(184,150,46,0.18)",
+              borderRadius: 14, padding: "26px 30px",
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              flexWrap: "wrap", gap: 20,
+            }}>
+              <div>
+                <div style={{ color: "#2D3748", fontSize: 11, marginBottom: 5, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                  {selected.length > 0 ? `${selected.length} service${selected.length > 1 ? "s" : ""} selected` : "No services selected"}
+                </div>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                  <span style={{ fontSize: 44, fontWeight: 900, color: selected.length > 0 ? "#B8962E" : "#1A2332", lineHeight: 1 }}>
+                    {selected.length > 0 ? total.toLocaleString() : "—"}
+                  </span>
+                  {selected.length > 0 && <span style={{ color: "#4A5568", fontSize: 14, fontWeight: 600 }}>SAR</span>}
+                </div>
+              </div>
+              <button
+                onClick={handleSubmit}
+                style={{
+                  background: canSubmit ? "linear-gradient(135deg, #9A7A24, #C4A030)" : "rgba(255,255,255,0.03)",
+                  color: canSubmit ? "#0E1117" : "#2D3748",
+                  border: "none", borderRadius: 9, padding: "16px 40px",
+                  fontWeight: 800, fontSize: 14, cursor: "pointer",
+                  fontFamily: "'Inter', sans-serif", letterSpacing: "0.04em",
+                  boxShadow: canSubmit ? "0 8px 28px rgba(184,150,46,0.2)" : "none",
+                  transition: "all 0.2s",
+                }}
+              >
+                {sending ? "Submitting..." : "Confirm Selection"}
+              </button>
+            </div>
+
+            <div style={{ textAlign: "center", color: "#1E2A36", fontSize: 11, marginTop: 18, letterSpacing: "0.05em" }}>
+              Prices may vary depending on project scope · You will be contacted within 24 hours
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<Proposal />);
+  </script>
+</body>
+</html>
