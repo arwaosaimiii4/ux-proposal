@@ -14,6 +14,37 @@
     body { font-family: 'Inter', sans-serif; background: #0E1117; color: #E2E8F0; }
     input::placeholder { color: #4A5568; }
     input:focus { border-color: rgba(184,150,46,0.5) !important; outline: none; }
+    .contact-link {
+      display: flex; gap: 8px; align-items: center;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 7px; padding: 8px 16px;
+      font-size: 13px; color: #8899AA;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .contact-link:hover {
+      background: rgba(184,150,46,0.08);
+      border-color: rgba(184,150,46,0.3);
+      color: #B8962E;
+    }
+    .contact-btn {
+      background: transparent;
+      border: 1px solid rgba(184,150,46,0.3);
+      color: #B8962E; border-radius: 7px;
+      padding: 9px 24px; font-size: 12px;
+      font-weight: 600; cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.04em;
+      transition: all 0.2s;
+    }
+    .contact-btn:hover {
+      background: rgba(184,150,46,0.08);
+      border-color: rgba(184,150,46,0.5);
+    }
+    @media (max-width: 560px) {
+      .fields-grid { grid-template-columns: 1fr !important; }
+    }
   </style>
 </head>
 <body>
@@ -27,28 +58,25 @@
       title: "UI/UX Designer · Mobile Apps",
       bio: "Specialized in UX auditing for mobile applications — I transform interface problems into real growth opportunities through precise analysis and actionable recommendations.",
       phone: "0500390092",
+      phoneIntl: "+966500390092",
       email: "arwaosaimi@hotmail.com",
       whatsapp: "966500390092",
     };
 
     const sections = [
       {
-        id: "audit",
-        num: "01",
-        title: "UX Audit",
-        subtitle: "User Experience Analysis",
+        id: "audit", num: "01",
+        title: "UX Audit", subtitle: "User Experience Analysis",
         services: [
-          { id: "a1", name: "Full Audit of Current App",        desc: "Comprehensive review of the existing app identifying critical usability issues",  price: 1100 },
-          { id: "a2", name: "Usability Testing & Flow Problems", desc: "Testing ease of use and analyzing navigation and interaction flow issues",         price: 1000 },
-          { id: "a3", name: "Competitor & Benchmark Review",     desc: "Comparing the app against competitors and industry best practices",                price: 1900 },
-          { id: "a4", name: "Lo-Fi Wireframing",                 desc: "Sketching initial wireframes for proposed solutions and improvements",              price: 900  },
+          { id: "a1", name: "Full Audit of Current App",         desc: "Comprehensive review of the existing app identifying critical usability issues",  price: 1100 },
+          { id: "a2", name: "Usability Testing & Flow Problems",  desc: "Testing ease of use and analyzing navigation and interaction flow issues",         price: 1000 },
+          { id: "a3", name: "Competitor & Benchmark Review",      desc: "Comparing the app against competitors and industry best practices",                price: 1900 },
+          { id: "a4", name: "Lo-Fi Wireframing",                  desc: "Sketching initial wireframes for proposed solutions and improvements",              price: 900  },
         ],
       },
       {
-        id: "redesign",
-        num: "02",
-        title: "UX Redesign",
-        subtitle: "User Experience Redesign",
+        id: "redesign", num: "02",
+        title: "UX Redesign", subtitle: "User Experience Redesign",
         services: [
           { id: "r1", name: "New Information Architecture (IA)", desc: "Restructuring app information and building a clear, logical hierarchy",            price: 1700 },
           { id: "r2", name: "User Flows",                        desc: "Designing complete user journeys from entry point to final action",                price: 2200 },
@@ -62,23 +90,16 @@
       width: "100%",
       background: "rgba(255,255,255,0.02)",
       border: `1px solid ${err ? "rgba(220,50,50,0.5)" : "rgba(255,255,255,0.07)"}`,
-      borderRadius: 9,
-      padding: "13px 18px",
-      color: "#CBD5E0",
-      fontSize: 14,
+      borderRadius: 9, padding: "13px 18px",
+      color: "#CBD5E0", fontSize: 14,
       fontFamily: "'Inter', sans-serif",
       boxSizing: "border-box",
     });
 
     const labelStyle = {
-      fontSize: 11,
-      color: "#3D4F61",
-      marginBottom: 8,
-      letterSpacing: "0.1em",
-      textTransform: "uppercase",
-      display: "flex",
-      alignItems: "center",
-      gap: 4,
+      fontSize: 11, color: "#3D4F61", marginBottom: 8,
+      letterSpacing: "0.1em", textTransform: "uppercase",
+      display: "flex", alignItems: "center", gap: 4,
     };
 
     function Proposal() {
@@ -101,9 +122,9 @@
       }, 0);
 
       const selectedServices = selected.map(id => allServices.find(x => x.id === id));
-      const phoneValid  = clientPhone.trim().length >= 9;
-      const emailValid  = clientEmail.includes("@") && clientEmail.trim().length >= 5;
-      const canSubmit   = selected.length > 0 && clientName.trim() && phoneValid && emailValid && !sending;
+      const phoneValid = clientPhone.trim().length >= 9;
+      const emailValid = clientEmail.includes("@") && clientEmail.trim().length >= 5;
+      const canSubmit  = selected.length > 0 && clientName.trim() && phoneValid && emailValid && !sending;
 
       const handleSubmit = async () => {
         setShowValidation(true);
@@ -178,7 +199,8 @@
                 </div>
               </div>
               <a href={buildWhatsApp()} target="_blank" rel="noreferrer" style={{
-                display: "block", background: "linear-gradient(135deg, #1da851, #25D366)",
+                display: "block",
+                background: "linear-gradient(135deg, #1da851, #25D366)",
                 color: "#fff", borderRadius: 10, padding: "14px",
                 fontWeight: 700, fontSize: 14, textDecoration: "none", marginBottom: 10,
               }}>
@@ -213,27 +235,27 @@
             <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 8, color: "#EDE8D8" }}>{designer.name}</h1>
             <div style={{ color: "#4A6785", fontSize: 13, fontWeight: 500, marginBottom: 18, letterSpacing: "0.05em" }}>{designer.title}</div>
             <p style={{ color: "#4A5568", fontSize: 14, lineHeight: 1.9, maxWidth: 520, margin: "0 auto 28px" }}>{designer.bio}</p>
-            <button onClick={() => setShowContact(!showContact)} style={{
-              background: "transparent", border: "1px solid rgba(184,150,46,0.3)",
-              color: "#B8962E", borderRadius: 7, padding: "9px 24px",
-              fontSize: 12, fontWeight: 600, cursor: "pointer",
-              fontFamily: "'Inter', sans-serif", letterSpacing: "0.04em",
-            }}>
+
+            {/* ── Contact button ── */}
+            <button className="contact-btn" onClick={() => setShowContact(!showContact)}>
               {showContact ? "Hide Contact Info" : "Contact Info"}
             </button>
+
+            {/* ── Clickable contact links ── */}
             {showContact && (
-              <div style={{ marginTop: 16, display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
-                {[{ icon: "📞", val: designer.phone }, { icon: "✉️", val: designer.email }].map(c => (
-                  <div key={c.val} style={{
-                    background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)",
-                    borderRadius: 7, padding: "8px 16px", fontSize: 13, color: "#6B7A8D",
-                    display: "flex", gap: 8, alignItems: "center",
-                  }}>
-                    {c.icon} {c.val}
-                  </div>
-                ))}
+              <div style={{ marginTop: 16, display: "flex", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
+                <a href={`tel:${designer.phoneIntl}`} className="contact-link">
+                  📞 {designer.phone}
+                </a>
+                <a href={`mailto:${designer.email}`} className="contact-link">
+                  ✉️ {designer.email}
+                </a>
+                <a href={`https://wa.me/${designer.whatsapp}`} target="_blank" rel="noreferrer" className="contact-link">
+                  💬 WhatsApp
+                </a>
               </div>
             )}
+
             <div style={{ width: 48, height: 1, background: "linear-gradient(90deg, transparent, rgba(184,150,46,0.25), transparent)", margin: "26px auto 0" }} />
           </div>
 
@@ -320,7 +342,7 @@
               {showValidation && !clientName.trim() && <div style={{ color: "#FC8181", fontSize: 11, marginTop: 5 }}>Name is required</div>}
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 20 }}>
+            <div className="fields-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 20 }}>
               <div>
                 <div style={labelStyle}>Phone Number <span style={{ color: "#FC8181" }}>*</span></div>
                 <input
@@ -390,7 +412,7 @@
               </button>
             </div>
 
-            <div style={{ textAlign: "center", color: "#1E2A36", fontSize: 11, marginTop: 18, letterSpacing: "0.05em" }}>
+            <div style={{ textAlign: "center", color: "#4A5568", fontSize: 11, marginTop: 18, letterSpacing: "0.05em" }}>
               Prices may vary depending on project scope · You will be contacted within 24 hours
             </div>
           </div>
