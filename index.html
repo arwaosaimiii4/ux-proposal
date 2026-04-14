@@ -8,6 +8,7 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Cairo', sans-serif; background: #0E1117; }
@@ -18,6 +19,8 @@
   <div id="root"></div>
   <script type="text/babel">
     const { useState } = React;
+
+    emailjs.init("qvI3a004Gj0pFdS0E");
 
     const designer = {
       name: "Arwa Alousaimi",
@@ -102,6 +105,8 @@
       const [submitted, setSubmitted] = useState(false);
       const [clientName, setClientName] = useState("");
       const [showContact, setShowContact] = useState(false);
+      const [sending, setSending] = useState(false);
+      const [emailError, setEmailError] = useState(false);
 
       const pkg = packages.find((p) => p.id === selected);
       const addonsTotal = activeAddons.reduce((s, id) => {
@@ -116,9 +121,28 @@
         );
       };
 
-      const handleSubmit = () => {
+      const handleSubmit = async () => {
         if (!selected || !clientName.trim()) return;
-        setSubmitted(true);
+        setSending(true);
+        setEmailError(false);
+
+        const addonNames = activeAddons.length > 0
+          ? activeAddons.map((id) => addons.find((a) => a.id === id)?.label).join("، ")
+          : "لا توجد إضافات";
+
+        try {
+          await emailjs.send("service_h8v9v6c", "template_psf118q", {
+            client_name: clientName,
+            package_name: pkg?.name,
+            total: total.toLocaleString(),
+            addons: addonNames,
+          });
+          setSubmitted(true);
+        } catch (err) {
+          setEmailError(true);
+        } finally {
+          setSending(false);
+        }
       };
 
       const buildWhatsApp = () => {
@@ -146,12 +170,12 @@
               textAlign: "center",
               maxWidth: 480,
             }}>
-              <div style={{ color: "#B8962E", fontSize: 36, marginBottom: 20, letterSpacing: "0.1em" }}>✦</div>
-              <h2 style={{ color: "#E8DFC8", fontSize: 24, fontWeight: 900, marginBottom: 12, letterSpacing: "0.01em" }}>
+              <div style={{ color: "#B8962E", fontSize: 36, marginBottom: 20 }}>✦</div>
+              <h2 style={{ color: "#E8DFC8", fontSize: 24, fontWeight: 900, marginBottom: 12 }}>
                 شكراً {clientName}
               </h2>
               <p style={{ color: "#5A6A7D", fontSize: 14, lineHeight: 2, marginBottom: 32 }}>
-                تم استلام اختيارك — سيتواصل معك {designer.name} خلال 24 ساعة لتأكيد التفاصيل والبدء بالمشروع.
+                تم استلام طلبك — سيتواصل معك {designer.name} خلال 24 ساعة لتأكيد التفاصيل والبدء بالمشروع.
               </p>
               <div style={{
                 background: "rgba(255,255,255,0.02)",
@@ -211,19 +235,13 @@
             padding: "60px 24px 44px",
             textAlign: "center",
           }}>
-            <div style={{
-              width: 48, height: 1,
-              background: "linear-gradient(90deg, transparent, #B8962E, transparent)",
-              margin: "0 auto 26px",
-            }} />
+            <div style={{ width: 48, height: 1, background: "linear-gradient(90deg, transparent, #B8962E, transparent)", margin: "0 auto 26px" }} />
             <div style={{ color: "#B8962E", fontSize: 10, letterSpacing: "0.22em", fontWeight: 700, marginBottom: 16, textTransform: "uppercase" }}>
               عرض خدمات احترافي
             </div>
-            <h1 style={{ fontSize: 26, fontWeight: 900, marginBottom: 8, color: "#EDE8D8", letterSpacing: "0.01em" }}>{designer.name}</h1>
+            <h1 style={{ fontSize: 26, fontWeight: 900, marginBottom: 8, color: "#EDE8D8" }}>{designer.name}</h1>
             <div style={{ color: "#4A6785", fontSize: 13, fontWeight: 600, marginBottom: 20, letterSpacing: "0.06em" }}>{designer.title}</div>
-            <p style={{ color: "#4A5568", fontSize: 14, lineHeight: 2, maxWidth: 500, margin: "0 auto 30px" }}>
-              {designer.bio}
-            </p>
+            <p style={{ color: "#4A5568", fontSize: 14, lineHeight: 2, maxWidth: 500, margin: "0 auto 30px" }}>{designer.bio}</p>
             <button
               onClick={() => setShowContact(!showContact)}
               style={{
@@ -243,17 +261,12 @@
             </button>
             {showContact && (
               <div style={{ marginTop: 18, display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
-                {[
-                  { icon: "📞", val: designer.phone },
-                  { icon: "✉️", val: designer.email },
-                ].map((c) => (
+                {[{ icon: "📞", val: designer.phone }, { icon: "✉️", val: designer.email }].map((c) => (
                   <div key={c.val} style={{
                     background: "rgba(255,255,255,0.02)",
                     border: "1px solid rgba(255,255,255,0.07)",
-                    borderRadius: 7,
-                    padding: "8px 18px",
-                    fontSize: 13,
-                    color: "#6B7A8D",
+                    borderRadius: 7, padding: "8px 18px",
+                    fontSize: 13, color: "#6B7A8D",
                     display: "flex", gap: 8, alignItems: "center",
                   }}>
                     {c.icon} {c.val}
@@ -261,11 +274,7 @@
                 ))}
               </div>
             )}
-            <div style={{
-              width: 48, height: 1,
-              background: "linear-gradient(90deg, transparent, rgba(184,150,46,0.25), transparent)",
-              margin: "28px auto 0",
-            }} />
+            <div style={{ width: 48, height: 1, background: "linear-gradient(90deg, transparent, rgba(184,150,46,0.25), transparent)", margin: "28px auto 0" }} />
           </div>
 
           <div style={{ maxWidth: 920, margin: "0 auto", padding: "0 20px" }}>
@@ -273,39 +282,27 @@
             {/* Section title */}
             <div style={{ textAlign: "center", padding: "44px 0 28px" }}>
               <h2 style={{ fontSize: 18, fontWeight: 800, margin: "0 0 8px", color: "#A0AEC0", letterSpacing: "0.04em" }}>الباقات المتاحة</h2>
-              <p style={{ color: "#2D3748", fontSize: 11, margin: 0, letterSpacing: "0.08em" }}>
-                جميع الباقات تشمل · NDA · فاتورة رسمية · حقوق الملكية الكاملة
-              </p>
+              <p style={{ color: "#2D3748", fontSize: 11, margin: 0, letterSpacing: "0.08em" }}>جميع الباقات تشمل · NDA · فاتورة رسمية · حقوق الملكية الكاملة</p>
             </div>
 
             {/* Packages */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(265px, 1fr))", gap: 16, marginBottom: 32 }}>
               {packages.map((p) => (
-                <div
-                  key={p.id}
-                  onClick={() => setSelected(p.id)}
-                  style={{
-                    position: "relative",
-                    background: selected === p.id
-                      ? `rgba(255,255,255,0.04)`
-                      : "rgba(255,255,255,0.02)",
-                    border: `1px solid ${selected === p.id ? p.accent : "rgba(255,255,255,0.06)"}`,
-                    borderRadius: 14,
-                    padding: "28px 24px",
-                    cursor: "pointer",
-                    transition: "all 0.25s ease",
-                    transform: selected === p.id ? "translateY(-4px)" : "none",
-                    boxShadow: selected === p.id ? `0 24px 48px rgba(0,0,0,0.5)` : "none",
-                  }}
-                >
+                <div key={p.id} onClick={() => setSelected(p.id)} style={{
+                  position: "relative",
+                  background: selected === p.id ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.02)",
+                  border: `1px solid ${selected === p.id ? p.accent : "rgba(255,255,255,0.06)"}`,
+                  borderRadius: 14, padding: "28px 24px", cursor: "pointer",
+                  transition: "all 0.25s ease",
+                  transform: selected === p.id ? "translateY(-4px)" : "none",
+                  boxShadow: selected === p.id ? "0 24px 48px rgba(0,0,0,0.5)" : "none",
+                }}>
                   {p.badge && (
                     <div style={{
                       position: "absolute", top: -10, right: 20,
-                      background: "#B8962E",
-                      color: "#0E1117",
+                      background: "#B8962E", color: "#0E1117",
                       fontSize: 10, fontWeight: 800,
-                      padding: "3px 14px", borderRadius: 100,
-                      letterSpacing: "0.06em",
+                      padding: "3px 14px", borderRadius: 100, letterSpacing: "0.06em",
                     }}>{p.badge}</div>
                   )}
                   {selected === p.id && (
@@ -325,16 +322,13 @@
                     </div>
                     <div style={{ textAlign: "left", flexShrink: 0, marginRight: 10 }}>
                       <div style={{ fontSize: 28, fontWeight: 900, color: p.accent, lineHeight: 1 }}>{p.price.toLocaleString()}</div>
-                      <div style={{ fontSize: 10, color: "#3D4F61", marginTop: 3, letterSpacing: "0.05em" }}>ريال</div>
+                      <div style={{ fontSize: 10, color: "#3D4F61", marginTop: 3 }}>ريال</div>
                     </div>
                   </div>
                   <div style={{
                     display: "inline-block", fontSize: 10, color: p.accent,
-                    background: `${p.accent}10`,
-                    border: `1px solid ${p.accent}20`,
-                    padding: "3px 12px",
-                    borderRadius: 5, marginBottom: 16,
-                    letterSpacing: "0.04em",
+                    background: `${p.accent}10`, border: `1px solid ${p.accent}20`,
+                    padding: "3px 12px", borderRadius: 5, marginBottom: 16,
                   }}>⏱ {p.duration}</div>
                   <div style={{ height: 1, background: "rgba(255,255,255,0.04)", marginBottom: 14 }} />
                   <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
@@ -380,7 +374,6 @@
               </div>
             </div>
 
-            {/* Divider */}
             <div style={{ height: 1, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent)", marginBottom: 28 }} />
 
             {/* Client name */}
@@ -394,16 +387,25 @@
                   width: "100%",
                   background: "rgba(255,255,255,0.02)",
                   border: "1px solid rgba(255,255,255,0.07)",
-                  borderRadius: 9,
-                  padding: "14px 18px",
-                  color: "#CBD5E0",
-                  fontSize: 14,
+                  borderRadius: 9, padding: "14px 18px",
+                  color: "#CBD5E0", fontSize: 14,
                   fontFamily: "'Cairo', sans-serif",
-                  outline: "none",
-                  boxSizing: "border-box",
+                  outline: "none", boxSizing: "border-box",
                 }}
               />
             </div>
+
+            {/* Error message */}
+            {emailError && (
+              <div style={{
+                background: "rgba(220,50,50,0.08)",
+                border: "1px solid rgba(220,50,50,0.25)",
+                borderRadius: 9, padding: "12px 18px",
+                color: "#FC8181", fontSize: 13, marginBottom: 16, textAlign: "center",
+              }}>
+                حدث خطأ أثناء الإرسال، حاولي مرة ثانية
+              </div>
+            )}
 
             {/* Total + CTA */}
             <div style={{
@@ -426,23 +428,23 @@
               </div>
               <button
                 onClick={handleSubmit}
-                disabled={!selected || !clientName.trim()}
+                disabled={!selected || !clientName.trim() || sending}
                 style={{
-                  background: selected && clientName.trim()
+                  background: selected && clientName.trim() && !sending
                     ? "linear-gradient(135deg, #9A7A24, #C4A030)"
                     : "rgba(255,255,255,0.03)",
-                  color: selected && clientName.trim() ? "#0E1117" : "#2D3748",
+                  color: selected && clientName.trim() && !sending ? "#0E1117" : "#2D3748",
                   border: "none",
                   borderRadius: 9, padding: "16px 42px",
                   fontWeight: 800, fontSize: 14,
-                  cursor: selected && clientName.trim() ? "pointer" : "not-allowed",
+                  cursor: selected && clientName.trim() && !sending ? "pointer" : "not-allowed",
                   fontFamily: "'Cairo', sans-serif",
                   letterSpacing: "0.04em",
                   boxShadow: selected && clientName.trim() ? "0 8px 28px rgba(184,150,46,0.2)" : "none",
                   transition: "all 0.2s",
                 }}
               >
-                تأكيد الاختيار
+                {sending ? "جاري الإرسال..." : "تأكيد الاختيار"}
               </button>
             </div>
 
