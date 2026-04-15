@@ -133,14 +133,18 @@
         setEmailError(false);
         const servicesList = selectedServices.map(s => `• ${s.name} — ${s.price.toLocaleString()} SAR`).join("\n");
         try {
-          await emailjs.send("service_h8v9v6c", "template_psf118q", {
+          const params = {
             client_name:  clientName,
             client_phone: clientPhone,
             client_email: clientEmail,
             package_name: selectedServices.map(s => s.name).join(", "),
             total:        total.toLocaleString(),
             addons:       servicesList,
-          });
+          };
+          // إيميل لأروى
+          await emailjs.send("service_h8v9v6c", "template_psf118q", params);
+          // إيميل تأكيد للعميل
+          await emailjs.send("service_h8v9v6c", "template_e0ol78h", params);
           setSubmitted(true);
         } catch(e) {
           setEmailError(true);
